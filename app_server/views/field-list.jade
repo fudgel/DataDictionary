@@ -1,0 +1,47 @@
+extends layout
+
+block content
+
+  +nav("Data Dictionary", "dropdown_menu")
+    +nav_item( "/" ) Home
+    +nav_item( "/fields", "active" ) Fields
+    +nav_item( "contact.html" ) Contact
+    form(role='search', action='/fields/searchByName', method='get').navbar-form.navbar-right
+      div.form-group
+        input(type='text',placeholder='Search', name='name').form-control
+      | &nbsp;
+      button(type='submit').btn.btn-default Search
+  .row.page-header: .col-lg-12
+      h1= pageHeader.title
+  .row
+    .col-xs-12.col-md-12
+      .row
+        .col-xs-12.col-sm-11
+          div(class="table-responsive")
+            table(class="table table-striped table-bordered")
+              thead
+                tr
+                  th Field Name
+                  //th Qualified Name
+                  th Description
+                  th Data Type
+                  th Format
+                  th Values
+                  th Lifecycle Status
+                  th Resources
+                  th APIs Used
+              tbody
+                each document in fieldDocuments
+                  tr
+                    td
+                      a(href="/fields/#{document._id}")= document.unqualifedName
+                    //td #{document.qualifedName}
+                    td #{document.description}
+                    td #{document.type}
+                    td #{document.typeFormat}
+                    td #{document.enum}
+                    td.success #{document.lifecycleStatus}
+                    td #{document.resource}
+                    td #{document.swaggerSpec}
+    .col-xs-12.col-md-3
+      p= sidebar.callToAction

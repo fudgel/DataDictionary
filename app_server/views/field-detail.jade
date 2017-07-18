@@ -1,0 +1,33 @@
+extends layout
+
+block content
+
+  +nav("Data Dictionary", "dropdown_menu")
+    +nav_item( "/" ) Home
+    +nav_item( "/fields", "active" ) Fields
+    +nav_item( "contact.html" ) Contact
+  .row.page-header: .col-lg-12
+      h1= pageHeader.title
+  .row
+    .col-xs-12.col-md-9
+      .row
+        .col-xs-12.col-sm-6
+          .panel.panel-primary
+            .panel-heading
+              h2.panel-title Details
+            .panel-body
+              p id: #{fieldDocument._id}
+              p field: #{fieldDocument.unqualifedName}
+              //p attributeName: #{fieldDocument.qualifiedName}
+              p dataType: #{fieldDocument.type}
+              p format: #{fieldDocument.typeFormat}
+              p description: #{fieldDocument.description}
+              p lifecycle: #{fieldDocument.lifecycleStatus}
+              p ECDM Entity: #{fieldDocument.ecdmEntity}
+              p Superceded by: #{fieldDocument.supercededBy}
+              p Model Domains: #{fieldDocument.modelDomains}
+              p Resouces: #{fieldDocument.resource}
+              p APIs Used: #{fieldDocument.swaggerSpec}
+  .row
+    .col-xs-12.col-md-6
+      p= sidebar.callToAction

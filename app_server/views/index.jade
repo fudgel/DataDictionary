@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  +nav("Data Dictionary", "dropdown_menu")
+    +nav_item( "/", "active" ) Home
+    +nav_item( "/fields" ) Fields
+    +nav_item( "contact.html" ) Contact
+  h1= title
+  p Welcome to #{title}
