@@ -28,7 +28,7 @@ module.exports.fieldReadOne = function(req, res) {
 /* GET data dictionary list by the name */
 module.exports.fieldSearchByNameListRead = function(req, res) {
  if (req.params.nameregex) {
-   DDFields.find({'qualifiedName' : new RegExp(req.params.nameregex, 'i')}, function (err, fields) {
+   DDFields.find({'fieldName' : new RegExp(req.params.nameregex, 'i')}, function (err, fields) {
      console.log(fields);
      if(!fields) {
        sendJSONresponse(res, 404, {"message":"Field record for fieldId("+req.params.fieldId+") not found"});

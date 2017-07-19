@@ -2,5 +2,6 @@
  "server"     : "localhost",
  "port"       : "27017",
  "database"   : "dataDictionary",
- "debug"      : true
+ "debug"      : true,
+ "loadIntoDB" : true
 }

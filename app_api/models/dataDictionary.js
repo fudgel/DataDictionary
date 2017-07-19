@@ -1,16 +1,13 @@
 var mongoose = require('mongoose');
 
 var fieldsSchema = new mongoose.Schema({
-    id: String,
-    name: String,
+    fieldName: String,
     dataType: String,
-    attributeName: String,
     description: String,
+    enum: String,
     lifecycleStatus: String,
-    ecdmEntity: String,
-    supercededBy: String,
     resources: [String],
-    modelDomains: [String]
+    swaggerSpec: String
 },{collection:'fields'});
 
 mongoose.model('Fields', fieldsSchema);
