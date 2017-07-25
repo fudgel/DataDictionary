@@ -28,8 +28,8 @@ var getFieldInfo = function (req, res, callback) {
 var renderFieldDetailPage = function (req, res, fieldDetail) {
   common.trace("DEBUG:"+component+"renderFieldDetailPage","Invoked");
   res.render('field-detail', {
-    title: fieldDetail.fields.resource+":"+fieldDetail.fields.unqualifedName ,
-    pageHeader: {title: fieldDetail.fields.resource+":"+fieldDetail.fields.unqualifedName},
+    title: fieldDetail.fields.resources+":"+fieldDetail.fields.fieldName ,
+    pageHeader: {title: fieldDetail.fields.resources+":"+fieldDetail.fields.fieldName},
     sidebar: {
       context: 'TBC'
     },
