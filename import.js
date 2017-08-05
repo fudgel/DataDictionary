@@ -5,10 +5,12 @@ var yaml = require('yamljs'),
     dbRecords = '[', dbRecCount = 0,
 
     fs = require('fs'), 
+    swaggerSpecFile,
     configurationFile = 'config.json',
     dbURI,
     test = require('assert'),
     MongoClient = require('mongodb').MongoClient;
+
 
 // load config file to get mongodb config
 var config = JSON.parse(
@@ -20,11 +22,31 @@ if(config.debug){
     console.log('dbURI:'+dbURI);
 };        
 
-// Load yaml file using YAML.load 
-var file = 'PetStore.yaml';
-var swaggerJson = yaml.load(file);
+// Determine the Swagger Spect file to load - default to sample SwaggerSpec if not provided 
+if(config.debug){
+    console.log('Arguments length is:'+process.argv.length);
+    console.log('Arguments are:'+process.argv);
+};
+// If there is more than 2 arguments then assume it is the file name of the swagger spec to load
+if (process.argv.length>2) {
+    swaggerSpecFile = process.argv[2];
+} else {
+    swaggerSpecFile = 'PetStore.yaml';
+}
+
+if(config.debug){
+    console.log('Attempting to load SwaggerSpec File:'+swaggerSpecFile);
+};
+
+// Check that file exists
+if (!fs.existsSync(swaggerSpecFile)) {
+    console.log('ERROR:Swagger Specification File Not Found:['+swaggerSpecFile+']');
+    return 1;
+}
+
+var swaggerJson = yaml.load(swaggerSpecFile);
 // get filename to record source of field document
-swaggerSpec = file;
+swaggerSpec = swaggerSpecFile;
 if (swaggerJson){
         loadDataDictionary(null,swaggerJson);
 };
@@ -50,6 +72,7 @@ function loadDataDictionary(err, data) {
                 (attributes.properties[key].format) ? attrFormat = attributes.properties[key].format : attrFormat = "";
                 attr = key;
                 (attributes.properties[key].enum) ? attrEnum = attributes.properties[key].enum : attrEnum = "";
+                // If debug - print the JSON object constructed that will be consumed by MongoDB Client
                 if(config.debug){
                     console.log("db.fields.insert({fieldName:\""+attr+
                             "\",description:\""+attrDesc+
@@ -61,6 +84,7 @@ function loadDataDictionary(err, data) {
                             "\",swaggerSpec:\""+swaggerSpec+"\"})");
                 };
                 
+                // Need to inject initial prefix for JSON if records are to be loaded
                 if(dbRecCount>0){
                     dbRecords = dbRecords+","
                 };            
@@ -77,6 +101,7 @@ function loadDataDictionary(err, data) {
             }
         }
     }
+    // Close out the JSON object with ] character
     dbRecords = dbRecords+"]";
     if(dbRecCount>0){
         console.log("Preparing to load "+dbRecCount+" records into DB");
