@@ -4,7 +4,7 @@ var fieldsSchema = new mongoose.Schema({
     fieldName: String,
     dataType: String,
     description: String,
-    enum: String,
+    enum: [String],
     lifecycleStatus: String,
     resources: [String],
     swaggerSpec: String

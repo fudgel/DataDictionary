@@ -36,7 +36,11 @@ block content
                     td #{document.description}
                     td #{document.type}
                     td #{document.typeFormat}
-                    td #{document.enum}
+                    //td #{document.enum}
+                    td 
+                      ul
+                        each value in document.enum
+                          li= value
                     td.success #{document.lifecycleStatus}
                     td #{document.resources}
                     td #{document.swaggerSpec}

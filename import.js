@@ -44,9 +44,20 @@ if (!fs.existsSync(swaggerSpecFile)) {
     return 1;
 }
 
-var swaggerJson = yaml.load(swaggerSpecFile);
 // get filename to record source of field document
-swaggerSpec = swaggerSpecFile;
+// Check for both cases of path [ / or \ ] and extrace filename
+if (swaggerSpecFile.lastIndexOf('\\')>=0) {
+    swaggerSpec = swaggerSpecFile.substring(swaggerSpecFile.lastIndexOf('\\')+1);
+} else if ((swaggerSpecFile.lastIndexOf('/')>=0)){
+    swaggerSpec = swaggerSpecFile.substring(swaggerSpecFile.lastIndexOf('/')+1);
+// Else if just a filename, then capture
+} else {
+    swaggerSpec = swaggerSpecFile;
+}
+
+// read swagger (yaml) file
+var swaggerJson = yaml.load(swaggerSpecFile);
+// if succesfull load into data dictionary
 if (swaggerJson){
         loadDataDictionary(null,swaggerJson);
 };
@@ -61,8 +72,11 @@ function loadDataDictionary(err, data) {
     {
         // resource name
         resource = def;
-        // Ignore 'Error' class
-        if (resource!="Error" && resource!="ErrorModel") {
+        // Ignore 'Error', 'Request' or 'Response' classes
+        if (resource.toUpperCase().toString().indexOf("ERROR")==-1 &&
+            resource.toUpperCase().toString().indexOf("RESPONSE")==-1 &&
+            resource.toUpperCase().toString().indexOf("REQUEST")==-1) {
+
             attributes = defs[resource];
             // for each field, get name, type, desc
             for(var key in attributes["properties"])
@@ -71,15 +85,26 @@ function loadDataDictionary(err, data) {
                 (attributes.properties[key].description) ? attrDesc = attributes.properties[key].description : attrDesc = "";
                 (attributes.properties[key].format) ? attrFormat = attributes.properties[key].format : attrFormat = "";
                 attr = key;
-                (attributes.properties[key].enum) ? attrEnum = attributes.properties[key].enum : attrEnum = "";
+                //(attributes.properties[key].enum) ? attrEnum = attributes.properties[key].enum : attrEnum = "";
+                if (attributes.properties[key].enum) {
+                    console.log('Enumerations for field ['+key+']: '+attributes.properties[key].enum);
+                    attrEnum = '[';
+                    attributes.properties[key].enum.forEach(function(element) {
+                        attrEnum = attrEnum + '"'+element+'",';
+                    }, this);
+                    attrEnum = attrEnum.slice(0,-1)+']';
+                    console.log('Printed ENUM is -->'+attrEnum+'<--');
+                } else {
+                     attrEnum = "[]";
+                }
                 // If debug - print the JSON object constructed that will be consumed by MongoDB Client
                 if(config.debug){
                     console.log("db.fields.insert({fieldName:\""+attr+
                             "\",description:\""+attrDesc+
                             "\",type:\""+attrType+
                             "\",typeFormat:\""+attrFormat+
-                            "\",enum:\""+attrEnum+
-                            "\",lifecycleStatus:\"Active"+
+                            "\",enum:"+attrEnum+
+                            ",lifecycleStatus:\"Active"+
                             "\",resources:\""+resource+
                             "\",swaggerSpec:\""+swaggerSpec+"\"})");
                 };
@@ -93,8 +118,8 @@ function loadDataDictionary(err, data) {
                             "\",\"description\":\""+attrDesc+
                             "\",\"type\":\""+attrType+
                             "\",\"typeFormat\":\""+attrFormat+
-                            "\",\"enum\":\""+attrEnum+
-                            "\",\"lifecycleStatus\":\"Acitve"+
+                            "\",\"enum\":"+attrEnum+
+                            ",\"lifecycleStatus\":\"Acitve"+
                             "\",\"resources\":\""+resource+
                             "\",\"swaggerSpec\":\""+swaggerSpec+"\"}";
                 dbRecCount = dbRecCount+1;
