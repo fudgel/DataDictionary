@@ -82,7 +82,6 @@ function loadDataDictionary(err, data) {
             for(var key in attributes["properties"])
             {
                 attrType = attributes.properties[key].type;
-                (attributes.properties[key].description) ? attrDesc = attributes.properties[key].description : attrDesc = "";
                 (attributes.properties[key].format) ? attrFormat = attributes.properties[key].format : attrFormat = "";
                 attr = key;
                 //(attributes.properties[key].enum) ? attrEnum = attributes.properties[key].enum : attrEnum = "";
@@ -97,6 +96,17 @@ function loadDataDictionary(err, data) {
                 } else {
                      attrEnum = "[]";
                 }
+                // Capture description. Inject details if a field is using a reference to another resource.
+                (attributes.properties[key].description) ? attrDesc = attributes.properties[key].description : attrDesc = "";
+                if (attrType=="array") {
+                    console.log('attribute key ['+key+'] has reference of ['+attributes.properties[key].items.$ref+']');
+                    var ref = attributes.properties[key].items.$ref.toString();
+                    attrDesc = attrDesc + '. An object with a reference to the '+ref.substring(ref.lastIndexOf('/')+1)+' resource';
+                } else if (attrType=="object" && key!="data") {
+                    console.log('attribute key ['+key+'] has reference of ['+attributes.properties[key].properties[key].items.$ref+']');
+                    var ref = attributes.properties[key].properties[key].items.$ref.toString();
+                    attrDesc = attrDesc + '. An object with a reference to the '+ref.substring(ref.lastIndexOf('/')+1)+' resource';
+                }                
                 // If debug - print the JSON object constructed that will be consumed by MongoDB Client
                 if(config.debug){
                     console.log("db.fields.insert({fieldName:\""+attr+
